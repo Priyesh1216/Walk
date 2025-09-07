@@ -11,13 +11,60 @@
 <body>
   <div class="top">
     <h1>Local Explorer</h1>
-    <p>A web app for discovering nearby places by walking or biking distance.</p>
+
+    <label class="field">
+      <span>Category</span>
+      <select id="category">
+        <option value="restaurant">Restaurant</option>
+        <option value="cafe">Cafe</option>
+        <option value="bar">Bar</option>
+        <option value="park">Park</option>
+        <option value="gym">Gym</option>
+        <option value="library">Library</option>
+        <option value="shopping_mall">Shopping Mall</option>
+        <option value="bakery">Bakery</option>
+        <option value="bank">Bank</option>
+        <option value="museum">Museum</option>
+        <option value="movie_theater">Movie Theater</option>
+        <option value="pharmacy">Pharmacy</option>
+        <option value="gas_station">Gas Station</option>
+        <option value="zoo">Zoo</option>
+        <option value="art_gallery">Art Gallery</option>
+        <option value="other">Other (custom)</option>
+      </select>
+    </label>
+
+    <label class="field" id="customKeywordField" style="display:none;">
+      <span>Keyword</span>
+      <input id="customKeyword" placeholder="e.g., bubble tea" />
+    </label>
+
+    <label class="field">
+      <span>Max walk (min)</span>
+      <input id="maxMins" type="range" min="5" max="15" value="10" />
+      <span id="minsOut">10</span>
+    </label>
+
+    <button id="findBtn">Find spots</button>
   </div>
-  <div id="map"></div>
+
+
+  <div class="wrap">
+
+    <div class="left">
+      <div id="map" class="map"></div>
+    </div>
+    <div class="right">
+      <div id="results" class="results"></div>
+    </div>
+
+  </div>
+
   <script src="app.js"></script>
 
   <script async src="https://maps.googleapis.com/maps/api/js?key=BROWSER_KEY&libraries=marker&callback=initMap">
   </script>
+
 </body>
 
 </html>
