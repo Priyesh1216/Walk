@@ -53,17 +53,17 @@ if (slider !== null) {
   // When the slider changes, call updateMinutesLabel()
   slider.addEventListener("input", updateMinutesLabel);
 
-  //Call once at the start so label shows the initial value
+  // Call once at the start so label shows the initial value
   updateMinutesLabel();
 }
 
 // Find the test button
 var testButton = el("findBtn");
 
-// Again, check it exists before using it
+// Check it exists
 if (testButton !== null) {
   testButton.addEventListener("click", function () {
-    // Runs when the button is clicked
+    // Run when the button is clicked
     setStatus("Status helper works");
   });
 }
