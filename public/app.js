@@ -1,4 +1,4 @@
-let map, userMarker;
+let map, userMarker, AdvancedMarkerClass;
 
 // Helper function
 function el(id) {
@@ -10,10 +10,21 @@ function setStatus(msg) {
   if (results) results.innerHTML = `<div class="muted">${msg}</div>`;
 }
 
-// Initialize the map
-window.initMap = function () {
-  map = new google.maps.Map(document.getElementById("map"), {
+// Initialize the map (modular loader)
+window.initMap = async function () {
+  const { Map } = await google.maps.importLibrary("maps");
+  try {
+    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+    AdvancedMarkerClass = AdvancedMarkerElement;
+  }
+
+  catch {
+    AdvancedMarkerClass = null; // fallback later
+  }
+
+  map = new Map(document.getElementById("map"), {
     center: { lat: 45.5017, lng: -73.5673 }, // Montreal
+    mapId: "18152c697f1e27a89734557b",
     zoom: 12
   });
 };
@@ -43,6 +54,27 @@ function getPosition() {
 
 }
 
+// Add the marker on the map (for user location)
+function addUserMarker(lat, lng) {
+
+  // Remove old marker (if exists)
+  if (userMarker) {
+    if (typeof userMarker.setMap === "function") {
+      userMarker.setMap(null);
+    }
+
+    else {
+      userMarker.map = null;
+
+    }
+  }
+  userMarker = new AdvancedMarkerClass({
+    map,
+    position: { lat, lng },
+    title: "You are here"
+  });
+}
+
 
 // Live slider label
 // Find the slider element (range input)
@@ -57,14 +89,44 @@ if (slider !== null) {
   updateMinutesLabel();
 }
 
-// Find the test button
+// Find button
 var testButton = el("findBtn");
-
-// Check it exists
 if (testButton !== null) {
-  testButton.addEventListener("click", function () {
-    // Run when the button is clicked
-    setStatus("Status helper works");
+  testButton.addEventListener("click", async function () {
+    try {
+      setStatus("Finding your location…");
+      const coords = await getPosition();
+      const lat = coords.latitude;
+      const lng = coords.longitude;
+
+      map.setCenter({ lat, lng });
+      addUserMarker(lat, lng);
+
+      setStatus("Marker placed at your location");
+    }
+
+    catch (err) {
+      console.error(err);
+    }
   });
 }
 
+// ---- Load Maps script with key from /config ----
+(async function loadMaps() {
+  try {
+    const res = await fetch("/config");
+    const { mapsKey } = await res.json();
+    if (!mapsKey) {
+      console.error("Missing GOOGLE_MAPS_API_KEY");
+      setStatus("Maps key missing. Check server .env (GOOGLE_MAPS_API_KEY).");
+      return;
+    }
+    const s = document.createElement("script");
+    s.async = true;
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(mapsKey)}&libraries=marker&callback=initMap`;
+    document.head.appendChild(s);
+  } catch (e) {
+    console.error(e);
+    setStatus("Failed to load Google Maps. Check /config endpoint and network.");
+  }
+})();

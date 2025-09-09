@@ -13,8 +13,8 @@ const __dirname = path.dirname(__filename);
 // Serve static files from /public
 app.use(express.static(path.join(__dirname, "public")));
 
-app.get("/healthz", (req, res) => {
-  res.json({ ok: true, status: "Local Explorer server scaffold running" });
+app.get("/config", (_req, res) => {
+  res.json({ mapsKey: process.env.GOOGLE_MAPS_API_KEY || "" });
 });
 
 app.listen(PORT, () => {
